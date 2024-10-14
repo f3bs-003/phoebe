@@ -10,7 +10,7 @@ const handleError = (res, error) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT user_id, ncf_id, fullname, created_at, updated_at FROM users');
+    const [rows] = await pool.query('SELECT user_id, username, password, fullname, created_at, updated_at FROM users');
     res.json(rows);
   } catch (error) {
     handleError(res, error);
@@ -21,7 +21,7 @@ const getUserById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const [rows] = await pool.query('SELECT user_id, ncf_id, fullname, created_at, updated_at FROM users WHERE user_id = ?', [id]);
+    const [rows] = await pool.query('SELECT user_id, username, password, fullname, created_at, updated_at FROM users WHERE user_id = ?', [id]);
 
     if (rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
@@ -34,12 +34,12 @@ const getUserById = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  const { fullname, ncf_id, password } = req.body;
+  const { username, password, fullname } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const [result] = await pool.query('INSERT INTO users (fullname, ncf_id, password) VALUES (?, ?, ?)', [fullname, ncf_id, hashedPassword]);
-    res.status(201).json({ id: result.insertId, fullname, ncf_id }); // Remove password from response
+    const [result] = await pool.query('INSERT INTO users (user_id, username, password, fullname) VALUES (?, ?, ?, ?)', [user_id, username, hashedPassword, fullname]);
+    res.status(201).json({ id: result.insertId, username, fullname }); 
   } catch (error) {
     handleError(res, error);
   }
@@ -47,11 +47,11 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
-  const { fullname, ncf_id, password } = req.body;
+  const { username, password, fullname } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const [result] = await pool.query('UPDATE users SET fullname = ?, ncf_id = ?, password = ? WHERE user_id = ?', [fullname, ncf_id, hashedPassword, id]);
+    const [result] = await pool.query('UPDATE users SET username = ?, password = ?, fullname = ? WHERE user_id = ?', [username, hashedPassword, fullname, id]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'User not found' });

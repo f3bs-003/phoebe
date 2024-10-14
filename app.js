@@ -3,6 +3,9 @@ const bodyParser = require('body-parser');
 
 const authRoutes = require('./routes/authRoutes');
 const userRoute = require('./routes/userRoute');
+const departmentRoute = require('./routes/departmentRoute');
+const courseRoute = require('./routes/courseRoute');
+const studentRoute = require('./routes/studentRoute');
 
 const app = express();
 app.use(bodyParser.json());
@@ -14,10 +17,13 @@ app.get('/', function(req, res){
 });
 
 app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoute);
+app.use('/api/users', userRoute);
+app.use('/api/departments', departmentRoute);
+app.use('/api/courses', courseRoute);
+app.use('/api/students', studentRoute);
 
 const PORT = 5000;
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
